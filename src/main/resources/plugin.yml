@@ -1,0 +1,10 @@
+name: Abilities
+version: 1.0.0
+main: de.tmxx.abilities.Abilities
+author: tmxx
+description: Abilities test plugin
+api-version: 1.21
+depend: [ProtocolLib]
+
+commands:
+  test:
