@@ -1,22 +1,22 @@
 package de.tmxx.abilities;
 
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedParticle;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.AtomicDouble;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Project: abilities
@@ -27,6 +27,12 @@ import java.util.stream.Collectors;
  */
 public class FallDamageAbility implements Listener {
     private static final double MAX_DAMAGE_DISTANCE = 3;
+
+    private final Plugin plugin;
+
+    public FallDamageAbility(Plugin plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
@@ -45,11 +51,11 @@ public class FallDamageAbility implements Listener {
 
         event.setDamage(Math.max(0, baseDamage - damageDealt.get()));
 
-        playAnimation(player.getLocation());
+        playAnimation(player.getLocation(), plugin);
     }
 
     private double calculateDamage(double baseDamage, double distance) {
-        return (baseDamage / MAX_DAMAGE_DISTANCE) * distance;
+        return (baseDamage / MAX_DAMAGE_DISTANCE) * (MAX_DAMAGE_DISTANCE - distance);
     }
 
     private Map<LivingEntity, Double> getSurroundingPlayers(Player player) {
@@ -66,80 +72,63 @@ public class FallDamageAbility implements Listener {
         return surroundingPlayers;
     }
 
-    public static void playAnimation(Location location) {
-        List<Block> blocks = new ArrayList<>();
+    public static void playAnimation(Location location, Plugin plugin) {
+        Multimap<Integer, Block> blocks = HashMultimap.create();
         for (int x = location.getBlockX() - (int) MAX_DAMAGE_DISTANCE; x <= location.getBlockX() + MAX_DAMAGE_DISTANCE; x++) {
             for (int z = location.getBlockZ() - (int) MAX_DAMAGE_DISTANCE; z <= location.getBlockZ() + MAX_DAMAGE_DISTANCE; z++) {
-                int startY = location.getBlockY() - 2;
-                int endY = location.getBlockY() + 2;
-                Block block = location.getWorld().getBlockAt(x, startY, z);
-                while (block.getY() < endY) {
-                    Block relative = block.getRelative(BlockFace.UP);
-                    if (relative.isEmpty()) break;
+                double distanceSquared = Math.pow(x - location.getBlockX(), 2) + Math.pow(z - location.getBlockZ(), 2);
+                if (distanceSquared > MAX_DAMAGE_DISTANCE * MAX_DAMAGE_DISTANCE) continue;
 
-                    block = relative;
-                }
+                Block block = highestBlockInBounds(location.getWorld(), x, z, location.getBlockY() - 2, location.getBlockY() + 1);
 
-                if (block.isEmpty() || block.isPassable()) continue;
-                if (block.getLocation().distanceSquared(location) > Math.pow(MAX_DAMAGE_DISTANCE, 2)) continue;
-
-                blocks.add(block);
+                blocks.put((int) Math.sqrt(distanceSquared), block);
             }
         }
 
-        for (Block block : blocks) {
-            /*ArmorStand armorStand = block.getWorld().spawn(block.getLocation(), ArmorStand.class);
-            armorStand.setItem(EquipmentSlot.HEAD, ItemStack.of(block.getType()));
-            armorStand.setInvisible(true);
-            armorStand.setBasePlate(false);
-            /*FallingBlock fallingBlock = block.getWorld().spawn(block.getLocation(), FallingBlock.class);
-            fallingBlock.setBlockData(block.getBlockData());
-            fallingBlock.setBlockState(block.getState());
-            fallingBlock.setVelocity(new Vector(0, 1, 0));
-            fallingBlock.setDropItem(false);
-            fallingBlock.setHurtEntities(false);
-            block.setType(Material.AIR);*/
+        new BukkitRunnable() {
+            int step = 0;
+            @Override
+            public void run() {
+                if (step >= blocks.keys().size()) {
+                    cancel();
+                    return;
+                }
 
-            spawnFallingBlock(block);
+                blocks.get(step++).forEach(block -> spawnFallingBlock(block, plugin));
+            }
+        }.runTaskTimer(plugin, 0, 1);
+    }
+
+    private static Block highestBlockInBounds(World world, int x, int z, int minY, int maxY) {
+        for (int y = maxY; y >= minY; y--) {
+            Block block = world.getBlockAt(x, y, z);
+            if (block.isSolid()) return block;
         }
+
+        return null;
     }
 
-    private static void spawnFallingBlock(Block block) {
-        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        PacketContainer packet = manager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
-
-        packet.getModifier().getFields().forEach(field -> {
-            Bukkit.broadcastMessage(field.getField().getName() + ": " + field.getField().getType().getName());
-        });
-
-        packet.getIntegers().write(0, 9999);
-        packet.getUUIDs().write(0, UUID.randomUUID());
-        packet.getEntityTypeModifier().write(0, EntityType.FALLING_BLOCK);
-
-        packet.getDoubles().write(0, (double) block.getX());
-        packet.getDoubles().write(1, (double) block.getY() + 1D);
-        packet.getDoubles().write(2, (double) block.getZ());
-
-        packet.getIntegers().write(1, 1);
-
-        packet.getIntegers().write(2, convertVelocity(0));
-        packet.getIntegers().write(3, convertVelocity(4));
-        packet.getIntegers().write(4, convertVelocity(0));
-
-        manager.broadcastServerPacket(packet);
+    private static void spawnFallingBlock(Block block, Plugin plugin) {
+        block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getBlockData());
+        sendParticle(block.getLocation().clone().add(0.5, 0.5, 0.5));
     }
 
-    private static int convertVelocity(double velocity) {
-    /*
-      Minecraft represents a velocity within 4 blocks per second, in any direction,
-      by using the entire Short range, meaning you can only move up to 4 blocks/second
-      on any given direction
-    */
-        return (int) (clamp(velocity, -3.9, 3.9) * 8000);
-    }
+    private static void sendParticle(Location location) {
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        PacketContainer packet = protocolManager.createPacket(com.comphenix.protocol.PacketType.Play.Server.WORLD_PARTICLES);
 
-    private static double clamp(double targetNum, double min, double max) {
-        // Makes sure a number is within a range
-        return Math.max(min, Math.min(targetNum, max));
+        packet.getBooleans().write(0, false);
+        packet.getBooleans().write(1, true);
+        packet.getNewParticles().write(0, WrappedParticle.create(Particle.EXPLOSION, null));
+        packet.getDoubles().write(0, location.getX());
+        packet.getDoubles().write(1, location.getY());
+        packet.getDoubles().write(2, location.getZ());
+        packet.getFloat().write(0, 0f); // Offset X
+        packet.getFloat().write(1, 0f); // Offset Y
+        packet.getFloat().write(2, 0f); // Offset Z
+        packet.getFloat().write(3, 0f); // Speed
+        packet.getIntegers().write(0, 1); // Particle count
+
+        protocolManager.broadcastServerPacket(packet);
     }
 }
