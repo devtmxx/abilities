@@ -17,7 +17,7 @@ public class Abilities extends JavaPlugin {
     public void onEnable() {
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new FallDamageAbility(this), this);
-        pluginManager.registerEvents(new TornadoAbility(), this);
+        pluginManager.registerEvents(new TornadoAbility(this), this);
         pluginManager.registerEvents(new EnderShotAbility(this), this);
 
         Objects.requireNonNull(getCommand("test")).setExecutor(new TestCommand(this));

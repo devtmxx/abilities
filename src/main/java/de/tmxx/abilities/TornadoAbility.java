@@ -12,7 +12,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -24,28 +25,39 @@ import java.util.*;
  * @author timmauersberger
  * @version 1.0
  */
-public class TornadoAbility implements Listener {
+public class TornadoAbility implements Listener, Runnable {
     private static final Map<Integer, List<Vector>> PARTICLE_RINGS;
 
-    private final Map<UUID, Float> lastYawMap = new HashMap<>();
+    private final Set<Player> active = new HashSet<>();
     private final Map<Integer, Integer> particleStates = new HashMap<>();
 
-    public TornadoAbility() {
+    public TornadoAbility(Plugin plugin) {
         for (int i = 0; i < PARTICLE_RINGS.size(); i++) {
             int startPos = (int) (Math.random() * PARTICLE_RINGS.get(i).size());
             particleStates.put(i, startPos);
         }
+
+        Bukkit.getScheduler().runTaskTimer(plugin, this, 0L, 2L);
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        float yaw = player.getYaw();
-        float lastYaw = lastYawMap.getOrDefault(player.getUniqueId(), yaw);
-        lastYawMap.put(player.getUniqueId(), yaw);
-        float yawDiff = Math.abs(yaw - lastYaw);
+    public void onToggleSneak(PlayerToggleSneakEvent event) {
+        if (event.isSneaking()) {
+            active.add(event.getPlayer());
+        } else {
+            active.remove(event.getPlayer());
+        }
+    }
 
-        if (yawDiff > 30) playTornado(player);
+    @Override
+    public void run() {
+        active.forEach(this::playTornado);
+
+        for (int i = 0; i < PARTICLE_RINGS.size(); i++) {
+            int state = particleStates.get(i);
+            if (++state >= PARTICLE_RINGS.get(i).size()) state = 0;
+            particleStates.put(i, state);
+        }
     }
 
     private void playTornado(Player player) {
@@ -69,8 +81,7 @@ public class TornadoAbility implements Listener {
         for (int i = 0; i < PARTICLE_RINGS.size(); i++) {
             int state = particleStates.get(i);
             List<Vector> ringPositions = PARTICLE_RINGS.get(i);
-            Vector vector = ringPositions.get(state++ % ringPositions.size());
-            particleStates.put(i, state);
+            Vector vector = ringPositions.get(state);
 
             sendParticle(center.clone().add(vector));
         }
