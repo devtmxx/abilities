@@ -4,14 +4,12 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedParticle;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -19,8 +17,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -38,12 +34,12 @@ public class EnderShotAbility implements Listener {
     }
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (!event.getAction().isRightClick()) return;
-        if (event.getItem() == null) return;
-        if (!event.getItem().getType().equals(Material.STICK)) return;
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        if (!(event.getEntity().getShooter() instanceof Player player)) return;
+        if (!player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)) return;
 
-        shoot(event.getPlayer());
+        event.getEntity().remove();
+        shoot(player);
     }
 
     private void shoot(Player player) {
@@ -55,10 +51,10 @@ public class EnderShotAbility implements Listener {
         ArmorStand armorStand = spawn(center);
 
         new BukkitRunnable() {
+            final float pitch = center.getPitch() + 90;
             int steps = 0;
-            double xAngle = Math.PI / 2;
-            double yAngle = 0;
-            double zAngle = 0;
+            final double xAngle = pitchToAngle(pitch);
+            double animatedAngle = 0;
             final double angleSteps = Math.PI / 6;
 
             @Override
@@ -70,16 +66,19 @@ public class EnderShotAbility implements Listener {
                 }
                 steps++;
 
-                zAngle += angleSteps;
-                if (zAngle >= Math.PI * 2) zAngle -= Math.PI * 2;
+                animatedAngle += angleSteps;
+                if (animatedAngle >= Math.PI * 2) animatedAngle -= Math.PI * 2;
 
                 if (armorStand.isDead()) {
                     cancel();
                     return;
                 }
 
-                armorStand.setHeadPose(new EulerAngle(xAngle, yAngle, zAngle));
+                EulerAngle angle = new EulerAngle(xAngle, animatedAngle * angleYMultiplier(pitch), animatedAngle * angleZMultiplier(pitch));
+
+                armorStand.setHeadPose(angle);
                 sendParticle(armorStand.getLocation().clone().add(0, 0.75, 0).subtract(direction.clone().normalize().multiply(speed * 3)));
+                armorStand.getWorld().playSound(armorStand.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 0.5f, 2f);
                 armorStand.setVelocity(direction.clone());
 
                 AtomicBoolean remove = new AtomicBoolean(false);
@@ -108,7 +107,7 @@ public class EnderShotAbility implements Listener {
         armorStand.setGravity(true);
         armorStand.setSmall(true);
         armorStand.setItem(EquipmentSlot.HEAD, ItemStack.of(Material.DRAGON_EGG));
-        armorStand.setHeadPose(new EulerAngle(Math.PI / 2, 0, 0));
+        armorStand.setHeadPose(new EulerAngle(pitchToAngle(location.getPitch() + 90), 0, 0));
         armorStand.teleport(location);
         return armorStand;
     }
@@ -130,5 +129,17 @@ public class EnderShotAbility implements Listener {
         packet.getIntegers().write(0, 5); // Particle count
 
         protocolManager.broadcastServerPacket(packet);
+    }
+
+    private double pitchToAngle(float pitch) {
+        return pitch < 45 ? 0 : pitch <= 135 ? Math.PI / 2 : Math.PI;
+    }
+
+    private int angleYMultiplier(float pitch) {
+        return pitch >= 45 && pitch <= 135 ? 0 : 1;
+    }
+
+    private int angleZMultiplier(float pitch) {
+        return pitch >= 45 && pitch <= 135 ? 1 : 0;
     }
 }
