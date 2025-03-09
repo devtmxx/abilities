@@ -23,6 +23,9 @@ dependencies {
     // papermc
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.1.0")
+
+    // google guice
+    compileOnly("com.google.inject:guice:7.0.0")
 }
 
 java {

@@ -1,10 +1,12 @@
 name: Abilities
 version: 1.0.0
-main: de.tmxx.abilities.Abilities
+main: de.tmxx.abilities.AbilitiesPlugin
 author: tmxx
 description: Abilities test plugin
 api-version: 1.21
 depend: [ProtocolLib]
+libraries:
+  - com.google.inject:guice:7.0.0
 
 commands:
   test:
