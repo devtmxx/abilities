@@ -26,6 +26,7 @@ dependencies {
 
     // google guice
     compileOnly("com.google.inject:guice:7.0.0")
+    compileOnly("com.google.inject.extensions:guice-assistedinject:7.0.0")
 }
 
 java {

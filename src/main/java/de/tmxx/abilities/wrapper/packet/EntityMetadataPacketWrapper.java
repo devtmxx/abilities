@@ -21,8 +21,8 @@ import java.util.Map;
 public class EntityMetadataPacketWrapper implements PacketWrapper {
     private static final PacketType PACKET_TYPE = PacketType.Play.Server.ENTITY_METADATA;
 
-    private static final int ENTITY_ID_INDEX = 0;
-    private static final int METADATA_INDEX = 0;
+    private static final int ENTITY_ID = 0;
+    private static final int METADATA = 0;
 
     private final PacketContainer handle;
     private final Map<Integer, Object> metadata = new HashMap<>();
@@ -34,7 +34,7 @@ public class EntityMetadataPacketWrapper implements PacketWrapper {
     }
 
     public void setEntityId(int entityId) {
-        handle.getIntegers().write(ENTITY_ID_INDEX, entityId);
+        handle.getIntegers().write(ENTITY_ID, entityId);
     }
 
     public void setMetadata(int index, Object value) {
@@ -44,7 +44,7 @@ public class EntityMetadataPacketWrapper implements PacketWrapper {
     @Override
     public PacketContainer getHandle() {
         List<WrappedDataValue> metadata = compileMetadata();
-        handle.getDataValueCollectionModifier().write(METADATA_INDEX, metadata);
+        handle.getDataValueCollectionModifier().write(METADATA, metadata);
         return handle;
     }
 

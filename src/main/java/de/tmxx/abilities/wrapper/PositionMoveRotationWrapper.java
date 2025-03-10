@@ -16,12 +16,7 @@ public class PositionMoveRotationWrapper {
     final static Class<?> MINECRAFT_CLASS;
     private static Constructor<?> constructor;
 
-    private Vec3Wrapper position;
-    private Vec3Wrapper velocity;
-    private float yaw;
-    private float pitch;
-
-    private Object handle;
+    private final Object handle;
 
     public PositionMoveRotationWrapper() {
         this(Vec3Wrapper.zero());
@@ -40,11 +35,6 @@ public class PositionMoveRotationWrapper {
     }
 
     public PositionMoveRotationWrapper(Vec3Wrapper position, Vec3Wrapper velocity, float yaw, float pitch) {
-        this.position = position;
-        this.velocity = velocity;
-        this.yaw = yaw;
-        this.pitch = pitch;
-
         try {
             handle = getConstructor().newInstance(position.getHandle(), velocity.getHandle(), yaw, pitch);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {

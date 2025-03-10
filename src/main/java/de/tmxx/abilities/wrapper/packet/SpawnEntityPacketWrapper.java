@@ -20,23 +20,23 @@ import java.util.UUID;
 public class SpawnEntityPacketWrapper implements PacketWrapper {
     private static final PacketType PACKET_TYPE = PacketType.Play.Server.SPAWN_ENTITY;
 
-    private static final int ENTITY_ID_INDEX = 0;
-    private static final int UNIQUE_ID_INDEX = 0;
-    private static final int ENTITY_TYPE_INDEX = 0;
+    private static final int ENTITY_ID = 0;
+    private static final int UNIQUE_ID = 0;
+    private static final int ENTITY_TYPE = 0;
 
-    private static final int POSITION_X_INDEX = 0;
-    private static final int POSITION_Y_INDEX = 1;
-    private static final int POSITION_Z_INDEX = 2;
+    private static final int POSITION_X = 0;
+    private static final int POSITION_Y = 1;
+    private static final int POSITION_Z = 2;
 
-    private static final int PITCH_INDEX = 1;
-    private static final int BODY_YAW_INDEX = 2;
-    private static final int HEAD_YAW_INDEX = 3;
+    private static final int PITCH = 1;
+    private static final int BODY_YAW = 2;
+    private static final int YAW = 3;
 
-    private static final int DATA_INDEX = 4;
+    private static final int DATA = 4;
 
-    private static final int VELOCITY_X_INDEX = 0;
-    private static final int VELOCITY_Y_INDEX = 1;
-    private static final int VELOCITY_Z_INDEX = 2;
+    private static final int VELOCITY_X = 0;
+    private static final int VELOCITY_Y = 1;
+    private static final int VELOCITY_Z = 2;
 
     private final PacketContainer handle;
 
@@ -60,35 +60,35 @@ public class SpawnEntityPacketWrapper implements PacketWrapper {
     }
 
     public void setEntityId(int entityId) {
-        handle.getIntegers().write(ENTITY_ID_INDEX, entityId);
+        handle.getIntegers().write(ENTITY_ID, entityId);
     }
 
     public void setEntityType(EntityType entityType) {
-        handle.getEntityTypeModifier().write(ENTITY_TYPE_INDEX, entityType);
+        handle.getEntityTypeModifier().write(ENTITY_TYPE, entityType);
     }
 
     public void setUniqueId(UUID uniqueId) {
-        handle.getUUIDs().write(UNIQUE_ID_INDEX, uniqueId);
+        handle.getUUIDs().write(UNIQUE_ID, uniqueId);
     }
 
     public void setLocation(Location location) {
-        handle.getDoubles().write(POSITION_X_INDEX, location.getX());
-        handle.getDoubles().write(POSITION_Y_INDEX, location.getY());
-        handle.getDoubles().write(POSITION_Z_INDEX, location.getZ());
+        handle.getDoubles().write(POSITION_X, location.getX());
+        handle.getDoubles().write(POSITION_Y, location.getY());
+        handle.getDoubles().write(POSITION_Z, location.getZ());
 
-        handle.getIntegers().write(HEAD_YAW_INDEX, (int) ProtocolUtils.toAngle(location.getYaw()));
-        handle.getIntegers().write(BODY_YAW_INDEX, (int) ProtocolUtils.toAngle(location.getYaw()));
-        handle.getIntegers().write(PITCH_INDEX, (int) ProtocolUtils.toAngle(location.getPitch()));
+        handle.getIntegers().write(YAW, (int) ProtocolUtils.toAngle(location.getYaw()));
+        handle.getIntegers().write(BODY_YAW, (int) ProtocolUtils.toAngle(location.getYaw()));
+        handle.getIntegers().write(PITCH, (int) ProtocolUtils.toAngle(location.getPitch()));
     }
 
     public void setData(int data) {
-        handle.getIntegers().write(DATA_INDEX, data);
+        handle.getIntegers().write(DATA, data);
     }
 
     public void setVelocity(Vector velocity) {
-        handle.getShorts().write(VELOCITY_X_INDEX, ProtocolUtils.toVelocity(velocity.getX()));
-        handle.getShorts().write(VELOCITY_Y_INDEX, ProtocolUtils.toVelocity(velocity.getY()));
-        handle.getShorts().write(VELOCITY_Z_INDEX, ProtocolUtils.toVelocity(velocity.getZ()));
+        handle.getShorts().write(VELOCITY_X, ProtocolUtils.toVelocity(velocity.getX()));
+        handle.getShorts().write(VELOCITY_Y, ProtocolUtils.toVelocity(velocity.getY()));
+        handle.getShorts().write(VELOCITY_Z, ProtocolUtils.toVelocity(velocity.getZ()));
     }
 
     @Override

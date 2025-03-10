@@ -2,17 +2,15 @@ package de.tmxx.abilities.entity;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import de.tmxx.abilities.util.PacketBroadcaster;
 import de.tmxx.abilities.wrapper.PositionMoveRotationWrapper;
 import de.tmxx.abilities.wrapper.Vec3Wrapper;
 import de.tmxx.abilities.wrapper.packet.*;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -70,8 +68,8 @@ public class CustomFallingBlock implements CustomEntity {
 
     @Override
     public void move(Location to) {
-        Bukkit.broadcast(Component.text("FROM: " + location.toString()));
-        Bukkit.broadcast(Component.text("TO: " + to.toString()));
+        if (to.equals(location)) return;
+
         if (!spawned) {
             location = to;
             return;
@@ -102,6 +100,8 @@ public class CustomFallingBlock implements CustomEntity {
 
     @Override
     public void teleport(Location to) {
+        if (to.equals(location)) return;
+
         if (!spawned) {
             location = to;
             return;
@@ -120,9 +120,7 @@ public class CustomFallingBlock implements CustomEntity {
                         location.getX(),
                         location.getY(),
                         location.getZ()
-                ),
-                location.getYaw(),
-                location.getPitch()
+                )
         ));
         packet.setOnGround(false);
         broadcastPacket(packet);
@@ -148,7 +146,8 @@ public class CustomFallingBlock implements CustomEntity {
         if (!spawned) return;
         spawned = false;
 
-        broadcastPacket(new EntityDestroyPacketWrapper(entityId));
+        EntityDestroyPacketWrapper packet = new EntityDestroyPacketWrapper(List.of(entityId));
+        broadcastPacket(packet);
     }
 
     public void setType(FallingBlockType type) {
@@ -171,8 +170,6 @@ public class CustomFallingBlock implements CustomEntity {
 
     private void broadcastPacket(PacketWrapper packet) {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        Bukkit.getOnlinePlayers().stream().filter(this::isVisibleTo).forEach(player -> {
-            manager.sendServerPacket(player, packet.getHandle());
-        });
+        manager.broadcastServerPacket(packet.getHandle(), location, VIEW_DISTANCE);
     }
 }

@@ -14,17 +14,17 @@ import org.bukkit.util.Vector;
  * @version 1.0
  */
 public class RelEntityMoveLookPacketWrapper implements PacketWrapper {
-    private static final PacketType PACKET_TYPE = PacketType.Play.Server.REL_ENTITY_MOVE;
+    private static final PacketType PACKET_TYPE = PacketType.Play.Server.REL_ENTITY_MOVE_LOOK;
 
-    private static final int ENTITY_ID_INDEX = 0;
-    private static final int DELTA_X_INDEX = 0;
-    private static final int DELTA_Y_INDEX = 1;
-    private static final int DELTA_Z_INDEX = 2;
-    private static final int YAW_INDEX = 0;
-    private static final int PITCH_INDEX = 1;
-    private static final int ON_GROUND_INDEX = 0;
-    private static final int HAS_ROT_INDEX = 1;
-    private static final int HAS_POS_INDEX = 2;
+    private static final int ENTITY_ID = 0;
+    private static final int DELTA_X = 0;
+    private static final int DELTA_Y = 1;
+    private static final int DELTA_Z = 2;
+    private static final int YAW = 0;
+    private static final int PITCH = 1;
+    private static final int ON_GROUND = 0;
+    private static final int HAS_ROT = 1;
+    private static final int HAS_POS = 2;
 
     private final PacketContainer handle;
 
@@ -47,44 +47,44 @@ public class RelEntityMoveLookPacketWrapper implements PacketWrapper {
     }
 
     public void setEntityId(int entityId) {
-        handle.getIntegers().write(ENTITY_ID_INDEX, entityId);
+        handle.getIntegers().write(ENTITY_ID, entityId);
     }
 
     public void setDeltaX(double deltaX) {
-        handle.getShorts().write(DELTA_X_INDEX, ProtocolUtils.toMovement(deltaX));
+        handle.getShorts().write(DELTA_X, ProtocolUtils.toMovement(deltaX));
         hasPos();
     }
 
     public void setDeltaY(double deltaY) {
-        handle.getShorts().write(DELTA_Y_INDEX, ProtocolUtils.toMovement(deltaY));
+        handle.getShorts().write(DELTA_Y, ProtocolUtils.toMovement(deltaY));
         hasPos();
     }
 
     public void setDeltaZ(double deltaZ) {
-        handle.getShorts().write(DELTA_Z_INDEX, ProtocolUtils.toMovement(deltaZ));
+        handle.getShorts().write(DELTA_Z, ProtocolUtils.toMovement(deltaZ));
         hasPos();
     }
 
     public void setYaw(float yaw) {
-        //handle.getBytes().write(YAW_INDEX, ProtocolUtils.toAngle(yaw));
+        handle.getBytes().write(YAW, ProtocolUtils.toAngle(yaw));
         hasRot();
     }
 
     public void setPitch(float pitch) {
-        //handle.getBytes().write(PITCH_INDEX, ProtocolUtils.toAngle(pitch));
+        handle.getBytes().write(PITCH, ProtocolUtils.toAngle(pitch));
         hasRot();
     }
 
     public void setOnGround(boolean onGround) {
-        handle.getBooleans().write(ON_GROUND_INDEX, onGround);
+        handle.getBooleans().write(ON_GROUND, onGround);
     }
 
     public void hasPos() {
-        //handle.getBooleans().write(HAS_POS_INDEX, true);
+        handle.getBooleans().write(HAS_POS, true);
     }
 
     public void hasRot() {
-       //handle.getBooleans().write(HAS_ROT_INDEX, true);
+       handle.getBooleans().write(HAS_ROT, true);
     }
 
     @Override

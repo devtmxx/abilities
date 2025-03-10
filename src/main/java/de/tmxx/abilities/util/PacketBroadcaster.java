@@ -14,6 +14,6 @@ import org.bukkit.Bukkit;
 public class PacketBroadcaster {
     public static void broadcast(PacketContainer packet) {
         Bukkit.broadcast(Component.text(packet.getType().name()));
-        packet.getModifier().getFields().forEach(field -> Bukkit.broadcast(Component.text(field.getField().getName() + ": " + field.getField().getType().getName())));
+        packet.getModifier().getFields().forEach(field -> Bukkit.broadcast(Component.text(field.getField().getName() + ": " + field.getField().getType().getName() + ": " + field.get(packet.getHandle()))));
     }
 }

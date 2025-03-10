@@ -7,6 +7,4 @@ api-version: 1.21
 depend: [ProtocolLib]
 libraries:
   - com.google.inject:guice:7.0.0
-
-commands:
-  test:
+  - com.google.inject.extensions:guice-assistedinject:7.0.0

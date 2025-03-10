@@ -1,10 +1,14 @@
 package de.tmxx.abilities;
 
+import com.google.common.reflect.ClassPath;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.bukkit.Bukkit;
+import de.tmxx.abilities.ability.Ability;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.logging.Level;
 
 /**
  * Project: abilities
@@ -25,6 +29,21 @@ public class AbilitiesPlugin extends JavaPlugin {
     public void onEnable() {
         injector = Guice.createInjector(new AbilitiesModule(this));
 
-        Bukkit.getPluginManager().registerEvents(new WaterBenderAbility(), this);
+        registerAbilities();
+    }
+
+    private void registerAbilities() {
+        try {
+            ClassPath.from(getClassLoader()).getTopLevelClasses(Ability.class.getPackageName()).forEach(classInfo -> {
+                Class<?> clazz = classInfo.load();
+                if (!Ability.class.isAssignableFrom(clazz) || Ability.class.equals(clazz)) return;
+
+                Class<? extends Ability> abilityClass = clazz.asSubclass(Ability.class);
+                Ability ability = injector.getInstance(abilityClass);
+                ability.register();
+            });
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Could not register abilities", e);
+        }
     }
 }

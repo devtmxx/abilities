@@ -20,6 +20,7 @@ public interface CustomEntity {
     AtomicInteger CURRENT_ID = new AtomicInteger(MIN_ID);
 
     int VIEW_DISTANCE_BLOCKS_SQUARED = 4096; // 64 blocks
+    int VIEW_DISTANCE = 64; // 64 blocks
     int MAX_MOVE_DISTANCE_SQUARED = 64; // 8 blocks
 
     default int generateEntityId() {

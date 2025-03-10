@@ -15,9 +15,9 @@ import de.tmxx.abilities.wrapper.PositionMoveRotationWrapper;
 public class EntityTeleportPacketWrapper implements PacketWrapper {
     private static final PacketType PACKET_TYPE = PacketType.Play.Server.ENTITY_TELEPORT;
 
-    private static final int ENTITY_ID_INDEX = 0;
-    private static final int POSITION_MOVE_ROTATION_INDEX = 1;
-    private static final int ON_GROUND_INDEX = 0;
+    private static final int ENTITY_ID = 0;
+    private static final int POS_MOV_ROT = 1;
+    private static final int ON_GROUND = 0;
 
     private final PacketContainer handle;
 
@@ -38,15 +38,15 @@ public class EntityTeleportPacketWrapper implements PacketWrapper {
     }
 
     public void setEntityId(int entityId) {
-        handle.getIntegers().write(ENTITY_ID_INDEX, entityId);
+        handle.getIntegers().write(ENTITY_ID, entityId);
     }
 
     public void setPosMovRot(PositionMoveRotationWrapper posMovRot) {
-        handle.getModifier().write(POSITION_MOVE_ROTATION_INDEX, posMovRot.getHandle());
+        handle.getModifier().write(POS_MOV_ROT, posMovRot.getHandle());
     }
 
     public void setOnGround(boolean onGround) {
-        handle.getBooleans().write(ON_GROUND_INDEX, onGround);
+        handle.getBooleans().write(ON_GROUND, onGround);
     }
 
     @Override
