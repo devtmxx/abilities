@@ -4,8 +4,10 @@ import com.google.inject.Inject;
 import de.tmxx.abilities.entity.CustomEntityRegistry;
 import de.tmxx.abilities.entity.CustomFallingBlock;
 import de.tmxx.abilities.entity.FallingBlockType;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +24,12 @@ public class WaterQueueImpl implements WaterQueue {
     private final CustomFallingBlock[] blocks = new CustomFallingBlock[QUEUE_LENGTH];
     private final List<Location> path = new ArrayList<>(QUEUE_LENGTH);
 
+    private final JavaPlugin plugin;
     private final CustomEntityRegistry entityRegistry;
 
     @Inject
-    public WaterQueueImpl(CustomEntityRegistry entityRegistry) {
+    public WaterQueueImpl(JavaPlugin plugin, CustomEntityRegistry entityRegistry) {
+        this.plugin = plugin;
         this.entityRegistry = entityRegistry;
     }
 
@@ -48,6 +52,12 @@ public class WaterQueueImpl implements WaterQueue {
             block.remove();
             block.getLocation().getBlock().setType(Material.WATER);
         }
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (CustomFallingBlock block : blocks) {
+                block.getLocation().getBlock().setType(Material.AIR);
+            }
+        }, 20L);
     }
 
     private CustomFallingBlock spawnBlock(Location sourceLocation) {
