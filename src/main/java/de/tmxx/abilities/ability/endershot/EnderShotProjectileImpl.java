@@ -24,9 +24,12 @@ import org.bukkit.util.Vector;
  * @version 1.0
  */
 public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShotProjectile {
+    private static final double HALF_PI = Math.PI / 2;
+    private static final double PI = Math.PI;
+    private static final double TWO_PI = 2 * Math.PI;
+    private static final double ANGLE_STEPS = 12.0D;
+    private static final double ANGLE_INCREASE = TWO_PI / ANGLE_STEPS;
     private static final double SPEED = 1.0D;
-    private static final double ANGLE_STEPS = 6.0D;
-    private static final double ANGLE_INCREASE = Math.PI / ANGLE_STEPS;
     private static final double LAUNCH_DISTANCE = 1.5D;
     private static final int TIMEOUT_STEP = 200;
     private static final int EXPLOSION_POWER = 1;
@@ -173,12 +176,12 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
 
     private void increaseCurrentAngle() {
         currentAngle += ANGLE_INCREASE;
-        if (currentAngle >= Math.PI * 2) currentAngle -= Math.PI * 2;
+        if (currentAngle >= TWO_PI) currentAngle -= TWO_PI;
     }
 
     private double pitchToAngle() {
         float pitch = pitch();
-        return pitch < 45 ? 0 : pitch <= 135 ? Math.PI / 2 : Math.PI;
+        return pitch < 45 ? 0 : pitch <= 135 ? HALF_PI : PI;
     }
 
     private int yMultiplier() {
