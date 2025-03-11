@@ -3,6 +3,7 @@ package de.tmxx.abilities.wrapper.packet;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import de.tmxx.abilities.util.PacketBroadcaster;
 import de.tmxx.abilities.util.ProtocolUtils;
 import org.bukkit.util.Vector;
 
@@ -16,9 +17,9 @@ import org.bukkit.util.Vector;
 public class EntityVelocityPacketWrapper implements PacketWrapper {
     private static final PacketType PACKET_TYPE = PacketType.Play.Server.ENTITY_VELOCITY;
     private static final int ENTITY_ID = 0;
-    private static final int VELOCITY_X = 0;
-    private static final int VELOCITY_Y = 0;
-    private static final int VELOCITY_Z = 0;
+    private static final int VELOCITY_X = 1;
+    private static final int VELOCITY_Y = 2;
+    private static final int VELOCITY_Z = 3;
 
     private final PacketContainer handle;
 
@@ -53,15 +54,15 @@ public class EntityVelocityPacketWrapper implements PacketWrapper {
     }
 
     public void setVelocityX(double velocityX) {
-        handle.getShorts().write(VELOCITY_X, ProtocolUtils.toVelocity(velocityX));
+        handle.getIntegers().write(VELOCITY_X, (int) ProtocolUtils.toVelocity(velocityX));
     }
 
     public void setVelocityY(double velocityY) {
-        handle.getShorts().write(VELOCITY_Y, ProtocolUtils.toVelocity(velocityY));
+        handle.getIntegers().write(VELOCITY_Y, (int) ProtocolUtils.toVelocity(velocityY));
     }
 
     public void setVelocityZ(double velocityZ) {
-        handle.getShorts().write(VELOCITY_Z, ProtocolUtils.toVelocity(velocityZ));
+        handle.getIntegers().write(VELOCITY_Z, (int) ProtocolUtils.toVelocity(velocityZ));
     }
 
     @Override

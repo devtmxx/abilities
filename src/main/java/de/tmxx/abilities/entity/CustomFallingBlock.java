@@ -33,7 +33,7 @@ public class CustomFallingBlock implements CustomEntity {
 
     private Location location = null;
     private int blockStateId = 0;
-    private boolean noGravity = true;
+    private boolean noGravity = false;
 
     @Inject
     public CustomFallingBlock(BlockStateIDLoader blockStateIDLoader) {
