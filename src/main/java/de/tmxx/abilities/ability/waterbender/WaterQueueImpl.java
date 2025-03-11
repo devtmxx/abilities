@@ -3,7 +3,6 @@ package de.tmxx.abilities.ability.waterbender;
 import com.google.inject.Inject;
 import de.tmxx.abilities.entity.CustomEntityRegistry;
 import de.tmxx.abilities.entity.CustomFallingBlock;
-import de.tmxx.abilities.entity.FallingBlockType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -62,7 +61,7 @@ public class WaterQueueImpl implements WaterQueue {
 
     private CustomFallingBlock spawnBlock(Location sourceLocation) {
         CustomFallingBlock fallingBlock = entityRegistry.createEntity(CustomFallingBlock.class);
-        fallingBlock.setType(FallingBlockType.BLUE_ICE);
+        fallingBlock.setType(Material.BLUE_ICE);
         fallingBlock.setNoGravity(true);
         fallingBlock.spawn(sourceLocation);
         return fallingBlock;

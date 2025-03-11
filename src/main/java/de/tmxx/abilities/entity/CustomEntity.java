@@ -3,6 +3,7 @@ package de.tmxx.abilities.entity;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -41,6 +42,7 @@ public interface CustomEntity {
     boolean isNoGravity();
     void move(Location to);
     void teleport(Location to);
+    void setVelocity(Vector velocity);
     void spawn(@NotNull Location location);
     void remove();
 }

@@ -2,12 +2,16 @@ package de.tmxx.abilities.entity;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.google.inject.Inject;
+import de.tmxx.abilities.util.BlockStateIDLoader;
 import de.tmxx.abilities.wrapper.PositionMoveRotationWrapper;
 import de.tmxx.abilities.wrapper.Vec3Wrapper;
 import de.tmxx.abilities.wrapper.packet.*;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,16 +25,19 @@ import java.util.UUID;
  * @version 1.0
  */
 public class CustomFallingBlock implements CustomEntity {
+    private final BlockStateIDLoader blockStateIDLoader;
     private final int entityId;
     private final UUID uniqueId = UUID.randomUUID();
 
     private boolean spawned = false;
 
     private Location location = null;
-    private FallingBlockType type = FallingBlockType.BLUE_ICE;
+    private int blockStateId = 0;
     private boolean noGravity = true;
 
-    public CustomFallingBlock() {
+    @Inject
+    public CustomFallingBlock(BlockStateIDLoader blockStateIDLoader) {
+        this.blockStateIDLoader = blockStateIDLoader;
         entityId = generateEntityId();
     }
 
@@ -127,6 +134,13 @@ public class CustomFallingBlock implements CustomEntity {
     }
 
     @Override
+    public void setVelocity(Vector velocity) {
+        EntityVelocityPacketWrapper packet = new EntityVelocityPacketWrapper(entityId);
+        packet.setVelocity(velocity);
+        broadcastPacket(packet);
+    }
+
+    @Override
     public void spawn(@NotNull Location location) {
         if (spawned) return;
         spawned = true;
@@ -134,7 +148,7 @@ public class CustomFallingBlock implements CustomEntity {
         this.location = location;
         SpawnEntityPacketWrapper packet = new SpawnEntityPacketWrapper(entityId, EntityType.FALLING_BLOCK, location);
         packet.setUniqueId(uniqueId);
-        packet.setData(type.getProtocolId());
+        packet.setData(blockStateId);
 
         broadcastPacket(packet);
 
@@ -150,8 +164,8 @@ public class CustomFallingBlock implements CustomEntity {
         broadcastPacket(packet);
     }
 
-    public void setType(FallingBlockType type) {
-        this.type = type;
+    public void setType(Material material) {
+        this.blockStateId = blockStateIDLoader.getBlockStateId(material);
 
         if (spawned) {
             // cannot change the type of falling block, so instead remove the old one and replace it with a new entity

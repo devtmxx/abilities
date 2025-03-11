@@ -16,11 +16,15 @@ public class ProtocolUtils {
     }
 
     public static short toVelocity(double value) {
-        value = Math.max(MIN_VELOCITY, Math.min(MAX_VELOCITY, value));
+        value = clamp(MIN_VELOCITY, value, MAX_VELOCITY);
         return (short) (value * 8000);
     }
 
     public static short toMovement(double delta) {
         return (short) (delta * 4096);
+    }
+
+    private static double clamp(double min, double value, double max) {
+        return value < min ? min : Math.min(value, max);
     }
 }

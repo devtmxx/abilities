@@ -4,6 +4,7 @@ import com.google.common.reflect.ClassPath;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import de.tmxx.abilities.ability.Ability;
+import de.tmxx.abilities.util.BlockStateIDLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +29,9 @@ public class AbilitiesPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         injector = Guice.createInjector(new AbilitiesModule(this));
+
+        BlockStateIDLoader loader = injector.getInstance(BlockStateIDLoader.class);
+        loader.loadBlockStateIDs();
 
         registerAbilities();
     }

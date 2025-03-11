@@ -8,6 +8,7 @@ import de.tmxx.abilities.ability.endershot.EnderShotProjectileImpl;
 import de.tmxx.abilities.ability.waterbender.WaterQueue;
 import de.tmxx.abilities.ability.waterbender.WaterQueueImpl;
 import de.tmxx.abilities.entity.CustomEntityRegistry;
+import de.tmxx.abilities.util.BlockStateIDLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -28,6 +29,7 @@ public class AbilitiesModule extends AbstractModule {
     protected void configure() {
         bind(JavaPlugin.class).toInstance(plugin);
         bind(CustomEntityRegistry.class);
+        bind(BlockStateIDLoader.class);
 
         install(new FactoryModuleBuilder()
                 .implement(WaterQueue.class, WaterQueueImpl.class)
