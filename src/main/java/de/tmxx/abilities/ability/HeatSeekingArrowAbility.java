@@ -1,11 +1,12 @@
 package de.tmxx.abilities.ability;
 
 import com.google.inject.Inject;
+import de.tmxx.abilities.ability.heatseekingarrow.ArrowGuidance;
 import de.tmxx.abilities.ability.heatseekingarrow.TargetFinder;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -55,6 +56,15 @@ public class HeatSeekingArrowAbility implements Ability, Listener, Runnable {
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         if (!(event.getEntity() instanceof Arrow arrow)) return;
         if (!(arrow.getShooter() instanceof Player player)) return;
+
+        TargetFinder targetFinder = trackingPlayers.get(player.getUniqueId());
+        if (targetFinder == null) return;
+
+        Entity target = targetFinder.getCurrentTarget();
+        if (target == null) return;
+
+        ArrowGuidance arrowGuidance = factory.newArrowGuidance(player, target, arrow);
+        arrowGuidance.start();
     }
 
     @Override

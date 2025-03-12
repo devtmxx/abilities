@@ -7,5 +7,6 @@ package de.tmxx.abilities.ability.heatseekingarrow;
  * @author timmauersberger
  * @version 1.0
  */
-public interface HeatSeekingArrow {
+public interface ArrowGuidance {
+    void start();
 }

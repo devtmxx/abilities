@@ -5,8 +5,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import de.tmxx.abilities.ability.AbilityFactory;
 import de.tmxx.abilities.ability.endershot.EnderShotProjectile;
 import de.tmxx.abilities.ability.endershot.EnderShotProjectileImpl;
-import de.tmxx.abilities.ability.heatseekingarrow.HeatSeekingArrow;
-import de.tmxx.abilities.ability.heatseekingarrow.HeatSeekingArrowImpl;
+import de.tmxx.abilities.ability.heatseekingarrow.ArrowGuidance;
+import de.tmxx.abilities.ability.heatseekingarrow.ArrowGuidanceImpl;
 import de.tmxx.abilities.ability.heatseekingarrow.TargetFinder;
 import de.tmxx.abilities.ability.heatseekingarrow.TargetFinderImpl;
 import de.tmxx.abilities.ability.waterbender.WaterQueue;
@@ -38,7 +38,7 @@ public class AbilitiesModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(WaterQueue.class, WaterQueueImpl.class)
                 .implement(EnderShotProjectile.class, EnderShotProjectileImpl.class)
-                .implement(HeatSeekingArrow.class, HeatSeekingArrowImpl.class)
+                .implement(ArrowGuidance.class, ArrowGuidanceImpl.class)
                 .implement(TargetFinder.class, TargetFinderImpl.class)
                 .build(AbilityFactory.class));
     }

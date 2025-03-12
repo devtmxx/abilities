@@ -24,8 +24,8 @@ import java.util.List;
  * @version 1.0
  */
 public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
-    private static final double SEARCH_DISTANCE = 32.0D;
-    private static final double MAX_SEARCH_ANGLE = Math.PI / 8;
+    private static final double SEARCH_DISTANCE = 60.0D;
+    private static final double MAX_SEARCH_ANGLE = Math.PI / 3;
     private static final String MARKER_TEAM_NAME = "marker_team";
 
     private final JavaPlugin plugin;
