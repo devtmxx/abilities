@@ -28,7 +28,7 @@ public class WaterBenderAbility implements Ability, Listener, Runnable {
     private final AbilityFactory abilityFactory;
 
     @Inject
-    public WaterBenderAbility(JavaPlugin plugin, AbilityFactory abilityFactory) {
+    WaterBenderAbility(JavaPlugin plugin, AbilityFactory abilityFactory) {
         this.plugin = plugin;
         this.abilityFactory = abilityFactory;
     }

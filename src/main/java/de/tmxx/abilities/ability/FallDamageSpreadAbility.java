@@ -37,7 +37,7 @@ public class FallDamageSpreadAbility implements Ability, Listener {
     private final JavaPlugin plugin;
 
     @Inject
-    public FallDamageSpreadAbility(JavaPlugin plugin) {
+    FallDamageSpreadAbility(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 

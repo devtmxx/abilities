@@ -27,7 +27,7 @@ public class WaterQueueImpl implements WaterQueue {
     private final CustomEntityRegistry entityRegistry;
 
     @Inject
-    public WaterQueueImpl(JavaPlugin plugin, CustomEntityRegistry entityRegistry) {
+    WaterQueueImpl(JavaPlugin plugin, CustomEntityRegistry entityRegistry) {
         this.plugin = plugin;
         this.entityRegistry = entityRegistry;
     }

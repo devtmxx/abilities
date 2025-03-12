@@ -36,7 +36,7 @@ public class CustomFallingBlock implements CustomEntity {
     private boolean noGravity = false;
 
     @Inject
-    public CustomFallingBlock(BlockStateIDLoader blockStateIDLoader) {
+    CustomFallingBlock(BlockStateIDLoader blockStateIDLoader) {
         this.blockStateIDLoader = blockStateIDLoader;
         entityId = generateEntityId();
     }

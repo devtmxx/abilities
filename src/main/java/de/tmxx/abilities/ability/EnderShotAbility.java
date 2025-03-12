@@ -21,7 +21,7 @@ public class EnderShotAbility implements Ability, Listener {
     private final AbilityFactory abilityFactory;
 
     @Inject
-    public EnderShotAbility(JavaPlugin plugin, AbilityFactory abilityFactory) {
+    EnderShotAbility(JavaPlugin plugin, AbilityFactory abilityFactory) {
         this.plugin = plugin;
         this.abilityFactory = abilityFactory;
     }
@@ -31,7 +31,7 @@ public class EnderShotAbility implements Ability, Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
         if (!(event.getEntity().getShooter() instanceof Player player)) return;
         if (!player.getInventory().getItemInMainHand().getType().equals(Material.CROSSBOW)) return;

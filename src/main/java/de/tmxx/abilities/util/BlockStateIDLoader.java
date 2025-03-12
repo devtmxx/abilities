@@ -35,7 +35,7 @@ public class BlockStateIDLoader {
     private final Map<Material, Integer> states = new HashMap<>();
 
     @Inject
-    public BlockStateIDLoader(JavaPlugin plugin) {
+    BlockStateIDLoader(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 

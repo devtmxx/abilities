@@ -50,7 +50,7 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
     private double currentAngle = 0;
 
     @Inject
-    public EnderShotProjectileImpl(JavaPlugin plugin, @Assisted Player shooter) {
+    EnderShotProjectileImpl(JavaPlugin plugin, @Assisted Player shooter) {
         this.plugin = plugin;
         this.shooter = shooter;
     }
