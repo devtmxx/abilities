@@ -15,7 +15,6 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Project: abilities
@@ -120,7 +119,7 @@ public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
         markerTeam = player.getScoreboard().getTeam(MARKER_TEAM_NAME);
         if (markerTeam == null) {
             markerTeam = player.getScoreboard().registerNewTeam(MARKER_TEAM_NAME);
-            markerTeam.color(NamedTextColor.LIGHT_PURPLE);
         }
+        markerTeam.color(NamedTextColor.AQUA);
     }
 }

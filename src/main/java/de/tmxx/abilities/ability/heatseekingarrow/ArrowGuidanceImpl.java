@@ -41,6 +41,7 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
     @Override
     public void run() {
         if (arrow.isDead() || !arrow.isValid() || arrow.isOnGround() || target.isDead() || !target.isValid()) {
+            arrow.setGlowing(false);
             cancel();
             return;
         }
