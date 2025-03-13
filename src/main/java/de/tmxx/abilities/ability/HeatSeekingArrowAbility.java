@@ -63,7 +63,7 @@ public class HeatSeekingArrowAbility implements Ability, Listener, Runnable {
         Entity target = targetFinder.getCurrentTarget();
         if (target == null) return;
 
-        ArrowGuidance arrowGuidance = factory.newArrowGuidance(player, target, arrow);
+        ArrowGuidance arrowGuidance = factory.newArrowGuidance(target, arrow);
         arrowGuidance.start();
     }
 

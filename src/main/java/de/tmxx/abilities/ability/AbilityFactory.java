@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 public interface AbilityFactory {
     WaterQueue newWaterQueue();
     EnderShotProjectile newEnderShotProjectile(Player shooter);
-    ArrowGuidance newArrowGuidance(Player shooter, Entity target, Arrow arrow);
+    ArrowGuidance newArrowGuidance(Entity target, Arrow arrow);
     TargetFinder newTargetFinder(Player player);
     Tornado newTornado(Player player);
 }

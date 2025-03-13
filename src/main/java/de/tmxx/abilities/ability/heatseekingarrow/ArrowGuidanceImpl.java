@@ -2,11 +2,8 @@ package de.tmxx.abilities.ability.heatseekingarrow;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -23,14 +20,14 @@ import org.bukkit.util.Vector;
  */
 public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, Listener {
     private final JavaPlugin plugin;
-    private final Player shooter;
     private final Entity target;
     private final Arrow arrow;
 
+    private double initialDistance = 0.0D;
+
     @Inject
-    ArrowGuidanceImpl(JavaPlugin plugin, @Assisted Player shooter, @Assisted Entity target, @Assisted Arrow arrow) {
+    ArrowGuidanceImpl(JavaPlugin plugin, @Assisted Entity target, @Assisted Arrow arrow) {
         this.plugin = plugin;
-        this.shooter = shooter;
         this.target = target;
         this.arrow = arrow;
     }
@@ -42,10 +39,13 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
             return;
         }
 
+        double currentDistance = arrow.getLocation().distance(target.getLocation());
+        double distanceRatio = currentDistance / initialDistance;
+
         Vector currentVelocity = arrow.getVelocity();
         double speed = currentVelocity.length();
         Vector targetDirection = target.getLocation().toVector().subtract(arrow.getLocation().toVector()).normalize();
-        Vector newVelocity = currentVelocity.multiply(0.5).add(targetDirection.multiply(0.5)).normalize().multiply(speed);
+        Vector newVelocity = currentVelocity.multiply(distanceRatio).add(targetDirection.multiply(1 - distanceRatio)).normalize().multiply(speed);
 
         arrow.setVelocity(newVelocity);
     }
@@ -60,6 +60,7 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
     @Override
     public void start() {
         arrow.setGravity(false);
+        initialDistance = arrow.getLocation().distance(target.getLocation());
         runTaskTimer(plugin, 0, 1L);
     }
 }
