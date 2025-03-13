@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,7 +25,8 @@ import java.util.List;
  * @version 1.0
  */
 public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
-    private static final double SEARCH_DISTANCE = 60.0D;
+    private static final double SEARCH_DISTANCE = 28.0D;
+    private static final double SEARCH_RADIUS = 32.0D;
     private static final double MAX_SEARCH_ANGLE = Math.PI / 3;
     private static final String MARKER_TEAM_NAME = "marker_team";
 
@@ -77,7 +79,9 @@ public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
         Location eyeLocation = player.getEyeLocation();
         Vector direction = eyeLocation.getDirection();
 
-        List<Entity> entities = player.getNearbyEntities(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE);
+        Location searchLocation = eyeLocation.clone().add(direction.clone().normalize().multiply(SEARCH_DISTANCE));
+        Collection<LivingEntity> entities = searchLocation.getNearbyLivingEntities(SEARCH_RADIUS);
+
         Entity closestEntity = null;
         double closestAngle = MAX_SEARCH_ANGLE;
 
