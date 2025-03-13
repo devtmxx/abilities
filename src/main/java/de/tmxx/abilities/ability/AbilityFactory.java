@@ -3,6 +3,7 @@ package de.tmxx.abilities.ability;
 import de.tmxx.abilities.ability.endershot.EnderShotProjectile;
 import de.tmxx.abilities.ability.heatseekingarrow.ArrowGuidance;
 import de.tmxx.abilities.ability.heatseekingarrow.TargetFinder;
+import de.tmxx.abilities.ability.tornado.Tornado;
 import de.tmxx.abilities.ability.waterbender.WaterQueue;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -20,4 +21,5 @@ public interface AbilityFactory {
     EnderShotProjectile newEnderShotProjectile(Player shooter);
     ArrowGuidance newArrowGuidance(Player shooter, Entity target, Arrow arrow);
     TargetFinder newTargetFinder(Player player);
+    Tornado newTornado(Player player);
 }

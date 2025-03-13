@@ -9,6 +9,8 @@ import de.tmxx.abilities.ability.heatseekingarrow.ArrowGuidance;
 import de.tmxx.abilities.ability.heatseekingarrow.ArrowGuidanceImpl;
 import de.tmxx.abilities.ability.heatseekingarrow.TargetFinder;
 import de.tmxx.abilities.ability.heatseekingarrow.TargetFinderImpl;
+import de.tmxx.abilities.ability.tornado.Tornado;
+import de.tmxx.abilities.ability.tornado.TornadoImpl;
 import de.tmxx.abilities.ability.waterbender.WaterQueue;
 import de.tmxx.abilities.ability.waterbender.WaterQueueImpl;
 import de.tmxx.abilities.entity.CustomEntityRegistry;
@@ -40,6 +42,7 @@ public class AbilitiesModule extends AbstractModule {
                 .implement(EnderShotProjectile.class, EnderShotProjectileImpl.class)
                 .implement(ArrowGuidance.class, ArrowGuidanceImpl.class)
                 .implement(TargetFinder.class, TargetFinderImpl.class)
+                .implement(Tornado.class, TornadoImpl.class)
                 .build(AbilityFactory.class));
     }
 }
