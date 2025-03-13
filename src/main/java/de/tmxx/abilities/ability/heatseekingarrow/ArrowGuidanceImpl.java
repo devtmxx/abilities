@@ -1,7 +1,11 @@
 package de.tmxx.abilities.ability.heatseekingarrow;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.wrappers.Vector3F;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import de.tmxx.abilities.wrapper.packet.WorldParticlesPacketWrapper;
+import org.bukkit.Particle;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -19,6 +23,8 @@ import org.bukkit.util.Vector;
  * @version 1.0
  */
 public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, Listener {
+    private static final int PARTICLE_VIEW_DISTANCE = 64;
+
     private final JavaPlugin plugin;
     private final Entity target;
     private final Arrow arrow;
@@ -39,6 +45,27 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
             return;
         }
 
+        guide();
+        sendParticles();
+    }
+
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent event) {
+        if (!event.getEntity().equals(arrow)) return;
+
+        arrow.setGlowing(false);
+        cancel();
+    }
+
+    @Override
+    public void start() {
+        arrow.setGravity(false);
+        arrow.setGlowing(true);
+        initialDistance = arrow.getLocation().distance(target.getLocation());
+        runTaskTimer(plugin, 0, 1L);
+    }
+
+    private void guide() {
         double currentDistance = arrow.getLocation().distance(target.getLocation());
         double distanceRatio = currentDistance / initialDistance;
 
@@ -50,17 +77,12 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
         arrow.setVelocity(newVelocity);
     }
 
-    @EventHandler
-    public void onProjectileHit(ProjectileHitEvent event) {
-        if (!event.getEntity().equals(arrow)) return;
-
-        cancel();
-    }
-
-    @Override
-    public void start() {
-        arrow.setGravity(false);
-        initialDistance = arrow.getLocation().distance(target.getLocation());
-        runTaskTimer(plugin, 0, 1L);
+    private void sendParticles() {
+        WorldParticlesPacketWrapper packet = new WorldParticlesPacketWrapper(arrow.getLocation().toVector(), Particle.SOUL_FIRE_FLAME);
+        packet.setSpeed(0);
+        packet.setCount(5);
+        packet.setOffset(new Vector3F(0f, 0f, 0f));
+        packet.setLongDistance(true);
+        ProtocolLibrary.getProtocolManager().broadcastServerPacket(packet.getHandle(), arrow.getLocation(), PARTICLE_VIEW_DISTANCE);
     }
 }
