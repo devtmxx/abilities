@@ -126,7 +126,7 @@ public class TornadoImpl implements Tornado, Runnable {
         PARTICLE_RINGS = new HashMap<>();
 
         Vector base = new Vector(0, 0, 0);
-        for (int i = 0; i < RINGS; i++) {
+        for (int i = 1; i <= RINGS; i++) {
             List<Vector> list = new ArrayList<>();
             float angle = (float) (Math.PI / (i * 2));
             base.add(SLOPE);
@@ -135,7 +135,7 @@ public class TornadoImpl implements Tornado, Runnable {
                 list.add(base.clone().rotateAroundY(angle * j));
             }
 
-            PARTICLE_RINGS.put(i, list);
+            PARTICLE_RINGS.put(i - 1, list);
         }
     }
 }
