@@ -1,9 +1,11 @@
 package de.tmxx.abilities.ability.heatseekingarrow;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import de.tmxx.abilities.wrapper.packet.EntityMetadataPacketWrapper;
+import de.tmxx.abilities.wrapper.packet.ScoreboardTeamPacketWrapper;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -15,6 +17,7 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Project: abilities
@@ -103,16 +106,25 @@ public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
     private void setMarker(boolean marker) {
         if (currentTarget == null) return;
 
+        int method;
         if (marker) {
-            markerTeam.addEntity(currentTarget);
+            method = ScoreboardTeamPacketWrapper.Method.JOIN;
         } else {
-            markerTeam.removeEntity(currentTarget);
+            method = ScoreboardTeamPacketWrapper.Method.LEAVE;
         }
 
-        EntityMetadataPacketWrapper packet = new EntityMetadataPacketWrapper(currentTarget.getEntityId());
-        packet.setMetadata(0, (byte) (marker ? 0x40 : 0));
+        EntityMetadataPacketWrapper metadataPacket = new EntityMetadataPacketWrapper(currentTarget.getEntityId());
+        metadataPacket.setMetadata(0, (byte) (marker ? 0x40 : 0));
 
-        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet.getHandle());
+        ScoreboardTeamPacketWrapper teamPacket = new ScoreboardTeamPacketWrapper();
+        teamPacket.setMethod(method);
+        teamPacket.setName(markerTeam.getName());
+        teamPacket.setPlayers(Collections.singletonList(currentTarget.getUniqueId().toString()));
+        teamPacket.setParameters(null);
+
+        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+        manager.sendServerPacket(player, metadataPacket.getHandle());
+        manager.sendServerPacket(player, teamPacket.getHandle());
     }
 
     private void setMarkerColor() {
