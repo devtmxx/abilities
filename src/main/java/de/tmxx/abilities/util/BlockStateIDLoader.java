@@ -45,6 +45,8 @@ public class BlockStateIDLoader {
 
     public void loadBlockStateIDs() {
         File file = new File(plugin.getDataFolder(), "blocks.json");
+
+        // Generate and compile reports if there are no compiled block states found
         if (!file.exists()) {
             if (!generateReports()) return;
             compileReports();
@@ -91,6 +93,10 @@ public class BlockStateIDLoader {
         }
     }
 
+    /**
+     * Compiles the generated reports by stripping it down to only the default block states, as we are not interested in
+     * rotations and other block metadata.
+     */
     private void compileReports() {
         File reportsFile = new File(plugin.getDataFolder(), "reports/blocks.json");
         File compiledFile = new File(plugin.getDataFolder(), "blocks.json");

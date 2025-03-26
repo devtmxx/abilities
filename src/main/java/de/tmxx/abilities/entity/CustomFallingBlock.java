@@ -82,11 +82,14 @@ public class CustomFallingBlock implements CustomEntity {
             return;
         }
 
+        // Teleport the entity if it should move to a new world. This will indirectly remove and re-spawn the entity
+        // later on.
         if (!location.getWorld().equals(to.getWorld())) {
             teleport(to);
             return;
         }
 
+        // Teleport if the distance to the new location is longer than a specified move distance.
         double distanceSquared = location.distanceSquared(to);
         if (distanceSquared >= MAX_MOVE_DISTANCE_SQUARED) {
             teleport(to);
@@ -114,6 +117,7 @@ public class CustomFallingBlock implements CustomEntity {
             return;
         }
 
+        // Remove and respawn the entity if it should be teleported to a new world.
         if (!location.getWorld().equals(to.getWorld())) {
             remove();
             spawn(to);
@@ -177,7 +181,7 @@ public class CustomFallingBlock implements CustomEntity {
 
     private void updateMetadata() {
         EntityMetadataPacketWrapper packet = new EntityMetadataPacketWrapper(entityId);
-        packet.setMetadata(EntityMetadataIndex.NO_GRAVITY, noGravity);
+        packet.setMetadata(EntityMetadataPacketWrapper.EntityMetadata.NO_GRAVITY, noGravity);
 
         broadcastPacket(packet);
     }

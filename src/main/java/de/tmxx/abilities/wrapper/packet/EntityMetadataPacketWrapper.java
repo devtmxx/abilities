@@ -55,4 +55,8 @@ public class EntityMetadataPacketWrapper implements PacketWrapper {
         });
         return list;
     }
+
+    public static final class EntityMetadata {
+        public static final int NO_GRAVITY = 5;
+    }
 }

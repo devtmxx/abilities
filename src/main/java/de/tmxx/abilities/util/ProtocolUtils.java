@@ -4,6 +4,10 @@ package de.tmxx.abilities.util;
  * Project: abilities
  * 09.03.2025
  *
+ * <p>
+ *     Converts values to minecraft protocol ready values.
+ * </p>
+ *
  * @author timmauersberger
  * @version 1.0
  */
