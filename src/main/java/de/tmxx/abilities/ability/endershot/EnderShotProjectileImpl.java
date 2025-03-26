@@ -20,15 +20,24 @@ import org.bukkit.util.Vector;
  * Project: abilities
  * 10.03.2025
  *
+ * <p>
+ *     This handles the projectile animation and calculates whether an entity has been hit.
+ * </p>
+ *
  * @author timmauersberger
  * @version 1.0
  */
 public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShotProjectile {
-    private static final double HALF_PI = Math.PI / 2;
+    // Just some helper values for better readability
     private static final double PI = Math.PI;
-    private static final double TWO_PI = 2 * Math.PI;
+    private static final double HALF_PI = PI / 2;
+    private static final double TWO_PI = 2 * PI;
+
+    // Values to calculate the projectiles angle
     private static final double ANGLE_STEPS = 12.0D;
     private static final double ANGLE_INCREASE = TWO_PI / ANGLE_STEPS;
+
+    // Projectile values
     private static final double SPEED = 1.0D;
     private static final double LAUNCH_DISTANCE = 1.5D;
     private static final int TIMEOUT_STEP = 200;
@@ -40,11 +49,16 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
     private final JavaPlugin plugin;
     private final Player shooter;
 
+    // Values to track the projectiles current state
     private Location launchLocation;
     private Vector launchDirection;
     private ArmorStand projectileHolder;
 
+    // The current progress of the projectile
     private int currentStep = 0;
+
+    // The current rotation of the projectile. The x and y multiplier's purpose is it to set the facing of the projectile
+    // (either up, down or horizontal)
     private int yMultiplier = 0;
     private int zMultiplier = 0;
     private double currentAngle = 0;
@@ -55,6 +69,9 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         this.shooter = shooter;
     }
 
+    /**
+     * Launches the projectile.
+     */
     @Override
     public void launch() {
         launchDirection = shooter.getEyeLocation().getDirection().clone().normalize().multiply(SPEED);
@@ -70,13 +87,18 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         runTaskTimer(plugin, 0L, 1L);
     }
 
+    /**
+     * Periodic update loop to handle the projectile animation.
+     */
     @Override
     public void run() {
+        // Cancel if the projectile holder has been removed
         if (projectileHolder.isDead()) {
             cancel();
             return;
         }
 
+        // Cancel if the current progress reaches the timeout limit
         if (currentStep == TIMEOUT_STEP) {
             projectileHolder.remove();
             cancel();
@@ -86,11 +108,13 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
 
         increaseCurrentAngle();
 
+        // Play animation
         projectileHolder.setHeadPose(currentHeadPose());
         projectileHolder.setVelocity(launchDirection.clone());
         playSound();
         displayParticles();
 
+        // Check if the projectile either hit an entity or a block and remove the projectile in each case.
         boolean remove = checkHitEntity() || checkHitBlock();
 
         if (remove) {
@@ -100,6 +124,9 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         }
     }
 
+    /**
+     * Spawns an armor stand as the projectile holder and teleports it to the launch location.
+     */
     private ArmorStand spawn() {
         ArmorStand armorStand = world().spawn(spawnLocation(), ArmorStand.class);
         armorStand.setInvisible(true);
@@ -116,6 +143,11 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         return launchLocation.getWorld();
     }
 
+    /**
+     * Gives the spawn location for the projectile holder. This is 100 blocks above where the projectile should
+     * actually launch. This is necessary because the projectile holder (armor stand) will be visible for a single tick,
+     * and we don't want players to see that.
+     */
     private Location spawnLocation() {
         return launchLocation.clone().add(0, 100, 0);
     }
@@ -142,15 +174,25 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         );
     }
 
+    /**
+     * Spawning particles at the exact projectile location will - for whatever reason - display the particles in front
+     * of the actual projectile at a distance depending on the projectiles speed. To prevent this we subtract a multiple
+     * of the projectiles direction from its position based on its speed.
+     */
     private Location particleLocation() {
         return projectileHolder.getLocation().clone()
                 .add(0, 0.75, 0)
                 .subtract(launchDirection.clone().normalize().multiply(SPEED * 3));
     }
 
+    /**
+     * Checks if an entity has been hit.
+     */
     private boolean checkHitEntity() {
         for (LivingEntity entity : world().getNearbyLivingEntities(projectileHolder.getLocation(), ENTITY_HIT_RADIUS)) {
+            // Do not count a hit to the projectile holder as it will always be in reach
             if (entity.equals(projectileHolder)) continue;
+
             entity.damage(PROJECTILE_DAMAGE);
             return true;
         }
@@ -158,6 +200,9 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         return false;
     }
 
+    /**
+     * Check if a solid block has been hit.
+     */
     private boolean checkHitBlock() {
         Location inFront = projectileHolder.getLocation().clone().add(launchDirection.clone().normalize().multiply(BLOCK_HIT_DISTANCE));
         return inFront.getBlock().isSolid();
@@ -167,6 +212,9 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         world().createExplosion(projectileHolder.getLocation(), EXPLOSION_POWER, true, true, shooter);
     }
 
+    /**
+     * Calculates the current head pose.
+     */
     private EulerAngle currentHeadPose() {
         double x = pitchToAngle();
         double y = yMultiplier * currentAngle;
@@ -194,6 +242,11 @@ public class EnderShotProjectileImpl extends BukkitRunnable implements EnderShot
         return pitch >= 45 && pitch <= 135 ? 1 : 0;
     }
 
+    /**
+     * By adding 90 degrees to the launch locations pitch, we make calculations more understandable. This is necessary
+     * because the facing of the projectile will not equal the facing of the launch location but rather its top, thus
+     * plus 90 degrees.
+     */
     private float pitch() {
         return launchLocation.getPitch() + 90;
     }

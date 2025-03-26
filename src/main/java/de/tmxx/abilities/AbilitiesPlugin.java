@@ -36,6 +36,9 @@ public class AbilitiesPlugin extends JavaPlugin {
         registerAbilities();
     }
 
+    /**
+     * Dynamically registers all abilities from the {@link de.tmxx.abilities.ability} package.
+     */
     private void registerAbilities() {
         try {
             ClassPath.from(getClassLoader()).getTopLevelClasses(Ability.class.getPackageName()).forEach(classInfo -> {

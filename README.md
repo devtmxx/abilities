@@ -59,3 +59,22 @@ When aiming with a bow a player can choose a target entity. Possible targets wil
 After shooting the arrow, it will be automatically guided to its target. Guided arrows will have a blue flame trail 
 while unguided arrows leave a normal trail. Guided arrows do not automatically avoid obstacles, but can be used to hit
 targets behind obstacles, for example, by aiming in the air to that the arrow flies over the obstacle.
+
+Nice to know
+===========
+
+## Block State IDs
+
+Since version 1.13 minecraft uses block state ids in its protocol instead of the block id and data. This plugin needs
+to know block state ids of different blocks in order to create packets to spawn falling blocks for the player. It turns 
+out that it is fairly difficult to obtain the block state id from any block as there is no API to access the registry.
+
+After doing some research I found a helper class built into the original minecraft server located 
+at `net.minecraft.server.data.Main`. Using this class it is possible to create a report of all possible block states and
+export it to a JSON formatted file. The `BlockStateIDLoader` then strips this file's content down to only the default
+state of each block (I have found rotation and other metadata to be irrelevant for this plugin's purpose) and saves the
+compiled result into the `Abilities/blocks.json` file. This compilation process is only done if the `Abilities/blocks.json`
+file does not exist.
+
+Please note that after a Minecraft version update, in order to use new blocks, the block state ids have to be
+re-generated. This is simply done by removing the `Abilities/blocks.json` file and reload the plugin.

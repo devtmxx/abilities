@@ -81,6 +81,8 @@ public class TornadoImpl implements Tornado, Runnable {
     }
 
     private void throwEntitiesAround() {
+        // Throws entities around by calculating the vector between the target entity and the player and switching its
+        // x and z values to move the entity tangential to the player
         player.getNearbyEntities(TORNADO_RANGE, TORNADO_RANGE, TORNADO_RANGE).stream()
                 .filter(entity -> !entity.equals(player))
                 .forEach(entity -> {
@@ -125,6 +127,7 @@ public class TornadoImpl implements Tornado, Runnable {
     static {
         PARTICLE_RINGS = new HashMap<>();
 
+        // Pre-calculates the points on each ring where a particle can spawn
         Vector base = new Vector(0, 0, 0);
         for (int i = 1; i <= RINGS; i++) {
             List<Vector> list = new ArrayList<>();

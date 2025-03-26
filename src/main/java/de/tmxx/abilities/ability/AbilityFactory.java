@@ -13,6 +13,10 @@ import org.bukkit.entity.Player;
  * Project: abilities
  * 10.03.2025
  *
+ * <p>
+ *     A factory to create ability related entities.
+ * </p>
+ *
  * @author timmauersberger
  * @version 1.0
  */

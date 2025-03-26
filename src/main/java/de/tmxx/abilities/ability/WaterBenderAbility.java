@@ -18,6 +18,12 @@ import java.util.*;
  * Project: abilities
  * 08.03.2025
  *
+ * <p>
+ *     This ability enables players to summon and control water using right-click interactions.
+ *     If a player right-clicks while looking at water, they can summon a water stream. Right-clicking
+ *     again will remove the stream and place real water blocks.
+ * </p>
+ *
  * @author timmauersberger
  * @version 1.0
  */
@@ -33,22 +39,33 @@ public class WaterBenderAbility implements Ability, Listener, Runnable {
         this.abilityFactory = abilityFactory;
     }
 
+    /**
+     * Handles player interactions to summon or remove water streams.
+     */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction().isRightClick()) {
-            if (queues.containsKey(event.getPlayer().getUniqueId())) {
-                queues.remove(event.getPlayer().getUniqueId()).despawn();
+            UUID uniqueId = event.getPlayer().getUniqueId();
+
+            // Remove existing water stream if already active
+            if (queues.containsKey(uniqueId)) {
+                queues.remove(uniqueId).despawn();
             } else {
                 Location targetLocation = locationFromView(event.getPlayer().getEyeLocation());
+
+                // Only activate ability if looking at water
                 if (!targetLocation.getBlock().getType().equals(Material.WATER)) return;
 
                 WaterQueue queue = abilityFactory.newWaterQueue();
                 queue.spawn(locationFromView(event.getPlayer().getEyeLocation()));
-                queues.put(event.getPlayer().getUniqueId(), queue);
+                queues.put(uniqueId, queue);
             }
         }
     }
 
+    /**
+     * Periodically updates the route of active water streams based on player movement.
+     */
     @Override
     public void run() {
         queues.forEach((uniqueId, queue) -> {
@@ -62,10 +79,17 @@ public class WaterBenderAbility implements Ability, Listener, Runnable {
 
     @Override
     public void register() {
+        // Register the ability as an event listener and schedule its updates
         Bukkit.getScheduler().runTaskTimer(plugin, this, 0L, 1L);
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
+    /**
+     * Calculates the target location on the player's line of sight.
+     *
+     * @param location The player's eye location.
+     * @return The projected target location within a fixed radius.
+     */
     private Location locationFromView(Location location) {
         int radius = 10;
         Vector direction = location.getDirection().clone().normalize();

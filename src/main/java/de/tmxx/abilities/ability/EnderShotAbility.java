@@ -13,6 +13,10 @@ import org.bukkit.plugin.java.JavaPlugin;
  * Project: abilities
  * 07.03.2025
  *
+ * <p>
+ *     When a player shoots with a crossbow this ability intercepts and launches a custom projectile.
+ * </p>
+ *
  * @author timmauersberger
  * @version 1.0
  */

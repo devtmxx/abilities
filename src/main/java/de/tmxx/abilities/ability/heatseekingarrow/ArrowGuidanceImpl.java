@@ -26,6 +26,8 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
     private static final int PARTICLE_VIEW_DISTANCE = 64;
 
     private final JavaPlugin plugin;
+
+    // Keeping track of the entities
     private final Entity target;
     private final Arrow arrow;
 
@@ -40,6 +42,7 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
 
     @Override
     public void run() {
+        // Remove the arrow if it is no longer in the air
         if (arrow.isDead() || !arrow.isValid() || arrow.isOnGround() || target.isDead() || !target.isValid()) {
             arrow.setGlowing(false);
             cancel();
@@ -62,10 +65,17 @@ public class ArrowGuidanceImpl extends BukkitRunnable implements ArrowGuidance, 
     public void start() {
         arrow.setGravity(false);
         arrow.setGlowing(true);
+
         initialDistance = arrow.getLocation().distance(target.getLocation());
         runTaskTimer(plugin, 0, 1L);
     }
 
+    /**
+     * Computes the new guiding velocity for the arrow. The direction of the velocity depends on the ratio of its
+     * current distance to the target to its initial distance. This means that the arrow initially flies in the
+     * direction in which the player is shooting and aligns itself more and more towards its target the closer is gets
+     * to the target.
+     */
     private void guide() {
         double currentDistance = arrow.getLocation().distance(target.getLocation());
         double distanceRatio = currentDistance / initialDistance;

@@ -23,6 +23,11 @@ import java.util.Collections;
  * Project: abilities
  * 12.03.25
  *
+ * <p>
+ *     This helps a player to find a target by marking the current target entity with an aqua outline. The current
+ *     target entity is chosen by its distance to the player's crosshair.
+ * </p>
+ *
  * @author timmauersberger
  * @version 1.0
  */
@@ -77,10 +82,14 @@ public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
         setMarker(true);
     }
 
+    /**
+     * Computes the nearest living entity to the player's crosshair.
+     */
     private Entity getNearestTarget() {
         Location eyeLocation = player.getEyeLocation();
         Vector direction = eyeLocation.getDirection();
 
+        // Only check living entities in front of the player
         Location searchLocation = eyeLocation.clone().add(direction.clone().normalize().multiply(SEARCH_DISTANCE));
         Collection<LivingEntity> entities = searchLocation.getNearbyLivingEntities(SEARCH_RADIUS);
 
@@ -103,6 +112,12 @@ public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
         return closestEntity;
     }
 
+    /**
+     * Set if the current target should be outlined. This is done by sending scoreboard team packets to the player. The
+     * reason to do it this way is that we don't want to manipulate the player's scoreboard directly because if there
+     * is no custom scoreboard, this will go back to the main scoreboard and would outline the target for all players.
+     * We also do not want to create our own custom scoreboard to prevent breaking other plugins.
+     */
     private void setMarker(boolean marker) {
         if (currentTarget == null) return;
 
@@ -127,6 +142,10 @@ public class TargetFinderImpl extends BukkitRunnable implements TargetFinder {
         manager.sendServerPacket(player, teamPacket.getHandle());
     }
 
+    /**
+     * Creates the scoreboard team used for the outlined target. In this case we manipulate the scoreboard directly as
+     * it has no effect on its own.
+     */
     private void setMarkerColor() {
         markerTeam = player.getScoreboard().getTeam(MARKER_TEAM_NAME);
         if (markerTeam == null) {
